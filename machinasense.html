@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MachinaSense — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+/* ═══════════════════════════════════════════════════
+   MachinaSense — CSS Design System
+   Palette: Industrial dark + electric cyan accent
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  --bg:        #0c0e14;
+  --surface:   #131720;
+  --surface2:  #1a1f2e;
+  --surface3:  #202637;
+  --border:    #252d42;
+  --accent:    #00d4ff;
+  --accent-dim: #0099bb;
+  --accent-glow: rgba(0, 212, 255, 0.18);
+  --green:     #22c55e;
+  --yellow:    #f59e0b;
+  --red:       #ef4444;
+  --text:      #e2e8f0;
+  --text-mid:  #94a3b8;
+  --text-dim:  #475569;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --radius:    10px;
+  --sidebar-w: 240px;
+  --topbar-h:  60px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-icon { width: 36px; height: 36px; flex-shrink: 0; }
+.brand-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.sidebar-nav {
+  padding: 14px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text-mid);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  position: relative;
+}
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+.badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+}
+.user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.user-name { font-size: 0.82rem; font-weight: 600; }
+.user-role { font-size: 0.72rem; color: var(--text-mid); }
+
+/* ─── MAIN CONTENT ─── */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: var(--topbar-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-title { font-size: 1rem; font-weight: 600; }
+.menu-toggle {
+  background: none; border: none; color: var(--text-mid);
+  cursor: pointer; padding: 4px; display: none;
+}
+.menu-toggle svg { width: 22px; height: 22px; }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.plant-selector {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.82rem; color: var(--text-mid);
+  border: 1px solid var(--border);
+  padding: 5px 12px; border-radius: 20px;
+}
+.topbar-date { font-size: 0.78rem; color: var(--text-dim); font-family: var(--font-mono); }
+
+/* ─── VIEW SYSTEM ─── */
+.view-container { flex: 1; overflow-y: auto; }
+.view { display: none; padding: 24px; animation: fadeIn 0.2s ease; }
+.view.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title { font-size: 0.9rem; font-weight: 600; }
+.card-sub { font-size: 0.75rem; color: var(--text-mid); }
+.card-wide { grid-column: 1 / -1; }
+
+/* ─── KPI ROW ─── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--border);
+}
+.kpi-green::before { background: var(--green); }
+.kpi-yellow::before { background: var(--yellow); }
+.kpi-red::before { background: var(--red); }
+.kpi-label { font-size: 0.75rem; color: var(--text-mid); margin-bottom: 8px; }
+.kpi-value { font-size: 2rem; font-weight: 700; font-family: var(--font-mono); }
+.kpi-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; }
+.kpi-dot {
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+}
+
+/* ─── DASHBOARD GRID ─── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ─── MACHINE STATUS GRID ─── */
+.machines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.machine-tile {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.machine-tile:hover { transform: translateY(-2px); }
+.machine-tile.status-green { border-color: rgba(34,197,94,0.4); }
+.machine-tile.status-yellow { border-color: rgba(245,158,11,0.4); }
+.machine-tile.status-red { border-color: rgba(239,68,68,0.5); animation: pulse-red 1.5s infinite; }
+.machine-tile-name { font-size: 0.78rem; font-weight: 600; margin-bottom: 8px; }
+.machine-tile-status { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-mid); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot-yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+.dot-red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.machine-tile-conf { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim); margin-top: 6px; }
+
+@keyframes pulse-red {
+  0%, 100% { border-color: rgba(239,68,68,0.5); }
+  50% { border-color: rgba(239,68,68,0.9); }
+}
+
+/* ─── FREQUENCY LABELS ─── */
+.freq-labels {
+  display: flex; justify-content: space-between;
+  font-size: 0.65rem; color: var(--text-dim);
+  font-family: var(--font-mono); margin-top: 4px;
+}
+
+/* ─── CALENDAR LIST ─── */
+.calendar-list { display: flex; flex-direction: column; gap: 8px; }
+.cal-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface2); border-radius: 6px; padding: 10px 12px;
+  border-left: 3px solid var(--border);
+}
+.cal-item.urgent { border-left-color: var(--red); }
+.cal-item.warn { border-left-color: var(--yellow); }
+.cal-item.ok { border-left-color: var(--green); }
+.cal-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-mid); width: 70px; flex-shrink: 0; }
+.cal-machine { font-size: 0.8rem; font-weight: 500; }
+.cal-task { font-size: 0.72rem; color: var(--text-mid); }
+
+/* ─── CHART LEGEND ─── */
+.chart-legend { display: flex; align-items: center; gap: 4px; font-size: 0.72rem; color: var(--text-mid); }
+.legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+
+/* ─── SCANNER ─── */
+.scanner-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 960px;
+}
+.scanner-card { display: flex; flex-direction: column; gap: 20px; }
+.scanner-machine-select { display: flex; flex-direction: column; gap: 6px; }
+.scanner-machine-select label { font-size: 0.8rem; color: var(--text-mid); }
+.scanner-machine-select select { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 8px 10px; font-family: var(--font-display); font-size: 0.85rem; }
+
+.mic-container { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 10px 0; }
+.mic-ring {
+  width: 130px; height: 130px; border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: all 0.3s;
+}
+.mic-ring.recording {
+  animation: mic-pulse 0.8s infinite alternate;
+  border-color: var(--red);
+  background: radial-gradient(circle, rgba(239,68,68,0.15) 0%, transparent 70%);
+}
+.mic-ring.recording .mic-inner {
+  background: rgba(239,68,68,0.2);
+  border-color: rgba(239,68,68,0.5);
+}
+@keyframes mic-pulse {
+  from { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+  to   { box-shadow: 0 0 0 20px rgba(239,68,68,0); }
+}
+.mic-inner {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: var(--accent-glow);
+  border: 1px solid rgba(0,212,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+}
+.mic-hint { font-size: 0.8rem; color: var(--text-mid); text-align: center; }
+
+.scan-progress-wrap { display: flex; flex-direction: column; gap: 6px; }
+.scan-progress-bar {
+  height: 6px; background: var(--surface3); border-radius: 10px; overflow: hidden;
+}
+.scan-progress-fill {
+  height: 100%; width: 0%; background: var(--accent); border-radius: 10px;
+  transition: width 0.1s linear;
+}
+#scan-progress-label { font-size: 0.75rem; color: var(--text-mid); font-family: var(--font-mono); }
+
+.analysis-steps { display: flex; flex-direction: column; gap: 12px; }
+.step { display: flex; align-items: center; gap: 14px; }
+.step-icon {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+}
+.step-pending { background: var(--surface3); border: 1px solid var(--border); color: var(--text-dim); }
+.step-active  { background: var(--accent-glow); border: 1px solid var(--accent); color: var(--accent); animation: spin-glow 1s linear infinite; }
+.step-done    { background: rgba(34,197,94,0.15); border: 1px solid var(--green); color: var(--green); }
+.step-name { font-size: 0.83rem; font-weight: 500; }
+.step-detail { font-size: 0.72rem; color: var(--text-mid); }
+
+@keyframes spin-glow {
+  0%,100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50% { box-shadow: 0 0 12px 2px var(--accent-glow); }
+}
+
+/* ─── RESULT PANEL ─── */
+.result-card { display: flex; flex-direction: column; gap: 20px; }
+.semaforo-header { display: flex; align-items: center; gap: 20px; }
+.semaforo {
+  display: flex; flex-direction: column; gap: 6px;
+  background: #0a0c10; border-radius: 14px; padding: 10px 8px;
+  border: 1px solid var(--border);
+}
+.semaforo-light {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--surface3); border: 1px solid var(--border);
+  transition: all 0.5s;
+}
+.semaforo-light.active-red    { background: var(--red);    box-shadow: 0 0 16px var(--red); }
+.semaforo-light.active-yellow { background: var(--yellow); box-shadow: 0 0 16px var(--yellow); }
+.semaforo-light.active-green  { background: var(--green);  box-shadow: 0 0 16px var(--green); }
+
+.result-status { font-size: 1.3rem; font-weight: 700; }
+.result-machine { font-size: 0.8rem; color: var(--text-mid); margin-top: 2px; }
+.result-details { display: flex; flex-direction: column; gap: 8px; }
+.detail-row { display: flex; justify-content: space-between; align-items: center; background: var(--surface2); padding: 8px 12px; border-radius: 6px; }
+.detail-label { font-size: 0.78rem; color: var(--text-mid); }
+.detail-value { font-size: 0.82rem; font-weight: 500; font-family: var(--font-mono); }
+.result-frequencies canvas { border-radius: 6px; background: var(--surface2); }
+.result-actions { display: flex; gap: 10px; }
+
+/* ─── MACHINES TABLE ─── */
+.machines-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.search-input {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); padding: 9px 14px; font-family: var(--font-display); font-size: 0.85rem;
+  width: 280px; outline: none; transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.machines-table-wrap { overflow-x: auto; }
+.machines-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+.machines-table th {
+  text-align: left; padding: 10px 14px;
+  border-bottom: 1px solid var(--border); color: var(--text-mid); font-weight: 500; font-size: 0.75rem;
+}
+.machines-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.machines-table tbody tr:hover { background: var(--surface2); }
+.status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+}
+.pill-green { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+.pill-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+.pill-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.conf-bar { display: flex; align-items: center; gap: 8px; }
+.conf-track { height: 5px; width: 80px; background: var(--surface3); border-radius: 10px; overflow: hidden; }
+.conf-fill { height: 100%; border-radius: 10px; background: var(--accent); }
+.conf-pct { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-mid); }
+.btn-icon { background: none; border: 1px solid var(--border); color: var(--text-mid); border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.15s; }
+.btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ─── HISTORY ─── */
+.history-filters { display: flex; gap: 12px; margin-bottom: 20px; }
+.history-filters select {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  padding: 7px 12px; border-radius: 6px; font-family: var(--font-display); font-size: 0.82rem;
+}
+.history-timeline { display: flex; flex-direction: column; gap: 0; }
+.history-item {
+  display: flex; gap: 20px; padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  animation: fadeIn 0.3s ease;
+}
+.hist-time-col { width: 120px; flex-shrink: 0; padding-top: 2px; }
+.hist-date { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); }
+.hist-time { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-mid); }
+.hist-dot-col { display: flex; flex-direction: column; align-items: center; width: 30px; flex-shrink: 0; }
+.hist-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; }
+.hist-line { flex: 1; width: 1px; background: var(--border); margin-top: 4px; }
+.hist-content { flex: 1; }
+.hist-machine { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+.hist-diag { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; }
+.hist-freq { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); margin-top: 4px; }
+.hist-tech { font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; }
+
+/* ─── ALERTS ─── */
+.alerts-list { display: flex; flex-direction: column; gap: 10px; }
+.alert-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  animation: slideIn 0.3s ease;
+}
+.alert-item.alert-red { border-left: 3px solid var(--red); }
+.alert-item.alert-yellow { border-left: 3px solid var(--yellow); }
+.alert-item.alert-green { border-left: 3px solid var(--green); }
+.alert-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ai-red { background: rgba(239,68,68,0.15); }
+.ai-yellow { background: rgba(245,158,11,0.15); }
+.alert-content { flex: 1; }
+.alert-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+.alert-desc { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; }
+.alert-meta { font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; font-family: var(--font-mono); }
+.alert-action { display: flex; align-items: center; }
+
+@keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 7px; font-family: var(--font-display);
+  font-size: 0.83rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #000; }
+.btn-primary:hover { background: #33deff; box-shadow: 0 0 16px rgba(0,212,255,0.3); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-mid); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 6px 14px; font-size: 0.78rem; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 200;
+  backdrop-filter: blur(4px);
+}
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px; width: 440px; max-width: 95vw;
+  animation: modalIn 0.2s ease;
+}
+.modal-wide { width: 620px; }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+.modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.form-group label { font-size: 0.78rem; color: var(--text-mid); }
+.form-group input, .form-group select {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  padding: 9px 12px; border-radius: 7px; font-family: var(--font-display); font-size: 0.85rem; outline: none;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* ─── REPORT ─── */
+.report-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.report-brand { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+.report-subtitle { font-size: 0.78rem; color: var(--text-mid); }
+.report-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); text-align: right; line-height: 1.8; }
+.report-body { display: flex; flex-direction: column; gap: 12px; }
+.report-section { background: var(--surface2); border-radius: 8px; padding: 14px; }
+.report-section-title { font-size: 0.75rem; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.report-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+.report-row:last-child { border-bottom: none; }
+.report-status-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-top: 4px;
+}
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 18px;
+  font-size: 0.82rem; color: var(--text);
+  transform: translateY(20px); opacity: 0;
+  transition: all 0.3s ease; z-index: 300;
+  max-width: 320px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ─── CANVAS ─── */
+canvas { display: block; width: 100%; border-radius: 6px; }
+#scan-waveform { border-radius: 6px; background: var(--surface2); }
+#waveform-canvas { background: var(--surface2); }
+#trend-canvas { background: var(--surface2); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+  .menu-toggle { display: block; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .scanner-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 500px) {
+  .kpi-row { grid-template-columns: 1fr; }
+  .view { padding: 14px; }
+  .modal { padding: 18px; }
+}
+
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <svg class="brand-icon" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" stroke="var(--accent)" stroke-width="2"/>
+        <path d="M8 20 Q14 10 20 20 Q26 30 32 20" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="20" cy="20" r="3" fill="var(--accent)"/>
+      </svg>
+      <span class="brand-name">MachinaSense</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Panel General
+      </a>
+      <a class="nav-item" data-view="scanner" onclick="switchView('scanner')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 17.7a8 8 0 0 0 0-11.4M4 4a12 12 0 0 0 0 16M20 20a12 12 0 0 0 0-16"/></svg>
+        Escáner Acústico
+      </a>
+      <a class="nav-item" data-view="machines" onclick="switchView('machines')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M12 12v4M8 12v2M16 12v2"/></svg>
+        Activos / Máquinas
+      </a>
+      <a class="nav-item" data-view="history" onclick="switchView('history')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        Historial
+      </a>
+      <a class="nav-item" data-view="alerts" onclick="switchView('alerts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alertas
+        <span class="badge" id="alert-badge">3</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">JG</div>
+      <div>
+        <div class="user-name">Jonny Goicochea</div>
+        <div class="user-role">Jefe de Planta</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-title" id="topbar-title">Panel General</div>
+      </div>
+      <div class="topbar-right">
+        <div class="plant-selector">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Planta Lima Norte
+        </div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </div>
+    </header>
+
+    <!-- VIEWS -->
+    <div class="view-container">
+
+      <!-- ═══════════════════════ DASHBOARD VIEW ═══════════════════════ -->
+      <section class="view active" id="view-dashboard">
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-label">Activos Monitoreados</div>
+            <div class="kpi-value">12</div>
+            <div class="kpi-sub">↑ 2 este mes</div>
+          </div>
+          <div class="kpi-card kpi-green">
+            <div class="kpi-label">Estado Normal</div>
+            <div class="kpi-value">8</div>
+            <div class="kpi-dot dot-green"></div>
+          </div>
+          <div class="kpi-card kpi-yellow">
+            <div class="kpi-label">Requieren Atención</div>
+            <div class="kpi-value">3</div>
+            <div class="kpi-dot dot-yellow"></div>
+          </div>
+          <div class="kpi-card kpi-red">
+            <div class="kpi-label">Falla Crítica</div>
+            <div class="kpi-value">1</div>
+            <div class="kpi-dot dot-red"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Machine Status Grid -->
+          <div class="card card-wide">
+            <div class="card-header">
+              <span class="card-title">Estado de Activos en Tiempo Real</span>
+              <span class="card-sub">Actualizado: hace 2 min</span>
+            </div>
+            <div class="machines-grid" id="machines-grid-main"></div>
+          </div>
+
+          <!-- Waveform / Frequency Analysis -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Última Captura Acústica</span>
+              <span class="card-sub">Motor Textil #03 — hace 18 min</span>
+            </div>
+            <canvas id="waveform-canvas" width="400" height="140"></canvas>
+            <div class="freq-labels">
+              <span>0 Hz</span><span>500 Hz</span><span>1 kHz</span><span>2 kHz</span><span>4 kHz</span>
+            </div>
+          </div>
+
+          <!-- Predictive Calendar -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Calendario Predictivo</span>
+            </div>
+            <div class="calendar-list" id="calendar-list"></div>
+          </div>
+
+          <!-- Trend Chart -->
+          <div class="card card-wide">
+            <div class="card-header">
+              <span class="card-title">Tendencia de Salud — Últimos 30 días</span>
+              <div class="chart-legend">
+                <span class="legend-dot dot-green"></span> Normal
+                <span class="legend-dot dot-yellow" style="margin-left:12px"></span> Atención
+                <span class="legend-dot dot-red" style="margin-left:12px"></span> Crítico
+              </div>
+            </div>
+            <canvas id="trend-canvas" width="800" height="160"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════ SCANNER VIEW ═══════════════════════ -->
+      <section class="view" id="view-scanner">
+        <div class="scanner-layout">
+          <div class="card scanner-card">
+            <div class="card-header">
+              <span class="card-title">Escáner Acústico con IA</span>
+              <span class="card-sub">Simula la captura del micrófono</span>
+            </div>
+
+            <div class="scanner-machine-select">
+              <label>Seleccionar Activo:</label>
+              <select id="scan-machine-select">
+                <option value="motor1">Motor Textil #01</option>
+                <option value="motor2">Motor Textil #02</option>
+                <option value="motor3" selected>Motor Textil #03</option>
+                <option value="comp1">Compresor #01</option>
+                <option value="turb1">Turbina #01</option>
+              </select>
+            </div>
+
+            <div class="mic-container">
+              <div class="mic-ring" id="mic-ring">
+                <div class="mic-inner" id="mic-btn" onclick="startScan()">
+                  <svg viewBox="0 0 48 48" fill="none" width="48">
+                    <rect x="16" y="4" width="16" height="28" rx="8" fill="var(--accent)" opacity="0.9"/>
+                    <path d="M8 24c0 8.8 7.2 16 16 16s16-7.2 16-16" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <line x1="24" y1="40" x2="24" y2="46" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="18" y1="46" x2="30" y2="46" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+              <p class="mic-hint" id="mic-hint">Presiona para iniciar grabación</p>
+            </div>
+
+            <!-- Live Waveform -->
+            <canvas id="scan-waveform" width="500" height="100" style="display:none"></canvas>
+
+            <!-- Progress Bar -->
+            <div class="scan-progress-wrap" id="scan-progress-wrap" style="display:none">
+              <div class="scan-progress-bar">
+                <div class="scan-progress-fill" id="scan-progress-fill"></div>
+              </div>
+              <span id="scan-progress-label">Grabando... 0s / 5s</span>
+            </div>
+
+            <!-- Analysis Steps -->
+            <div class="analysis-steps" id="analysis-steps" style="display:none">
+              <div class="step" id="step1">
+                <div class="step-icon step-pending" id="step1-icon">01</div>
+                <div>
+                  <div class="step-name">Captura de Audio</div>
+                  <div class="step-detail">Micrófono del dispositivo</div>
+                </div>
+              </div>
+              <div class="step" id="step2">
+                <div class="step-icon step-pending" id="step2-icon">02</div>
+                <div>
+                  <div class="step-name">Filtro de Ruido IA</div>
+                  <div class="step-detail">Aislando señal de la máquina...</div>
+                </div>
+              </div>
+              <div class="step" id="step3">
+                <div class="step-icon step-pending" id="step3-icon">03</div>
+                <div>
+                  <div class="step-name">Análisis Espectral</div>
+                  <div class="step-detail">Detectando patrones anómalos...</div>
+                </div>
+              </div>
+              <div class="step" id="step4">
+                <div class="step-icon step-pending" id="step4-icon">04</div>
+                <div>
+                  <div class="step-name">Diagnóstico Final</div>
+                  <div class="step-detail">Generando reporte...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Result Panel -->
+          <div class="card result-card" id="result-card" style="display:none">
+            <div class="semaforo-header">
+              <div class="semaforo" id="semaforo-indicator">
+                <div class="semaforo-light" id="sl-red"></div>
+                <div class="semaforo-light" id="sl-yellow"></div>
+                <div class="semaforo-light" id="sl-green"></div>
+              </div>
+              <div>
+                <div class="result-status" id="result-status">—</div>
+                <div class="result-machine" id="result-machine">—</div>
+              </div>
+            </div>
+
+            <div class="result-details" id="result-details"></div>
+
+            <div class="result-frequencies">
+              <div class="card-header" style="margin-bottom:10px">
+                <span class="card-title">Espectro de Frecuencias</span>
+              </div>
+              <canvas id="result-spectrum" width="420" height="130"></canvas>
+            </div>
+
+            <div class="result-actions">
+              <button class="btn btn-primary" onclick="generateReport()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Generar Reporte PDF
+              </button>
+              <button class="btn btn-outline" onclick="scanAgain()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                Nuevo Escaneo
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════ MACHINES VIEW ═══════════════════════ -->
+      <section class="view" id="view-machines">
+        <div class="machines-toolbar">
+          <input type="text" class="search-input" placeholder="Buscar activo..." oninput="filterMachines(this.value)" />
+          <button class="btn btn-primary btn-sm" onclick="openAddMachine()">+ Agregar Activo</button>
+        </div>
+        <div class="machines-table-wrap">
+          <table class="machines-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Sector</th>
+                <th>Último Escaneo</th>
+                <th>Estado</th>
+                <th>Confianza IA</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="machines-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════ HISTORY VIEW ═══════════════════════ -->
+      <section class="view" id="view-history">
+        <div class="history-filters">
+          <select id="history-machine-filter" onchange="renderHistory()">
+            <option value="">Todos los activos</option>
+            <option value="motor1">Motor Textil #01</option>
+            <option value="motor2">Motor Textil #02</option>
+            <option value="motor3">Motor Textil #03</option>
+            <option value="comp1">Compresor #01</option>
+          </select>
+          <select id="history-status-filter" onchange="renderHistory()">
+            <option value="">Todos los estados</option>
+            <option value="green">Normal</option>
+            <option value="yellow">Atención</option>
+            <option value="red">Crítico</option>
+          </select>
+        </div>
+        <div class="history-timeline" id="history-timeline"></div>
+      </section>
+
+      <!-- ═══════════════════════ ALERTS VIEW ═══════════════════════ -->
+      <section class="view" id="view-alerts">
+        <div class="alerts-list" id="alerts-list"></div>
+      </section>
+
+    </div><!-- end view-container -->
+  </main>
+
+  <!-- MODAL: Add Machine -->
+  <div class="modal-overlay" id="add-machine-modal" style="display:none" onclick="closeModal(event)">
+    <div class="modal">
+      <h2 class="modal-title">Nuevo Activo</h2>
+      <div class="form-group">
+        <label>Nombre del Activo</label>
+        <input type="text" id="new-machine-name" placeholder="ej. Compresor #02" />
+      </div>
+      <div class="form-group">
+        <label>Sector Industrial</label>
+        <select id="new-machine-sector">
+          <option>Textil</option>
+          <option>Manufactura</option>
+          <option>Minería</option>
+          <option>Automotriz</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Máquina</label>
+        <select id="new-machine-type">
+          <option>Motor Rotativo</option>
+          <option>Compresor</option>
+          <option>Turbina</option>
+          <option>Faja Transportadora</option>
+          <option>Telar Industrial</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeAddMachine()">Cancelar</button>
+        <button class="btn btn-primary" onclick="addMachine()">Registrar Activo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Report -->
+  <div class="modal-overlay" id="report-modal" style="display:none" onclick="closeModal(event)">
+    <div class="modal modal-wide">
+      <div class="report-header">
+        <div>
+          <div class="report-brand">MachinaSense</div>
+          <div class="report-subtitle">Reporte de Diagnóstico Acústico</div>
+        </div>
+        <div class="report-meta" id="report-meta"></div>
+      </div>
+      <div class="report-body" id="report-body"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="document.getElementById('report-modal').style.display='none'">Cerrar</button>
+        <button class="btn btn-primary" onclick="shareReport()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+/* ═══════════════════════════════════════════════════
+   MachinaSense — App Logic
+   ═══════════════════════════════════════════════════ */
+
+'use strict';
+
+/* ─── DATA ─── */
+const MACHINES = [
+  { id: 'motor1', name: 'Motor Textil #01', sector: 'Textil', type: 'Motor Rotativo', status: 'green', confidence: 94, lastScan: '2026-06-28 08:14', anomaly: null },
+  { id: 'motor2', name: 'Motor Textil #02', sector: 'Textil', type: 'Motor Rotativo', status: 'yellow', confidence: 78, lastScan: '2026-06-28 07:55', anomaly: 'Desalineación detectada (220 Hz)' },
+  { id: 'motor3', name: 'Motor Textil #03', sector: 'Textil', type: 'Motor Rotativo', status: 'red', confidence: 91, lastScan: '2026-06-28 09:40', anomaly: 'Falla de rodamiento inminente (840 Hz)' },
+  { id: 'comp1', name: 'Compresor #01', sector: 'Manufactura', type: 'Compresor', status: 'green', confidence: 88, lastScan: '2026-06-27 16:30', anomaly: null },
+  { id: 'comp2', name: 'Compresor #02', sector: 'Manufactura', type: 'Compresor', status: 'green', confidence: 96, lastScan: '2026-06-27 15:10', anomaly: null },
+  { id: 'turb1', name: 'Turbina #01',    sector: 'Minería',       type: 'Turbina', status: 'yellow', confidence: 72, lastScan: '2026-06-28 06:00', anomaly: 'Vibración elevada (310 Hz)' },
+  { id: 'faja1', name: 'Faja Transp. #01', sector: 'Minería',     type: 'Faja', status: 'green', confidence: 90, lastScan: '2026-06-27 14:00', anomaly: null },
+  { id: 'tela1', name: 'Telar #01',      sector: 'Textil', type: 'Telar Industrial', status: 'green', confidence: 85, lastScan: '2026-06-27 10:20', anomaly: null },
+];
+
+const HISTORY = [
+  { date: '2026-06-28', time: '09:40', machine: 'Motor Textil #03', machineId: 'motor3', status: 'red', diagnosis: 'Falla de rodamiento inminente. Frecuencia anómala a 840 Hz con amplitud crítica. Se recomienda parada preventiva inmediata.', frequencies: '840 Hz (crítica), 1680 Hz (armónico)', tech: 'Carlos Huanca' },
+  { date: '2026-06-28', time: '08:14', machine: 'Motor Textil #01', machineId: 'motor1', status: 'green', diagnosis: 'Funcionamiento normal. Espectro dentro de parámetros establecidos. Sin anomalías detectadas.', frequencies: '120 Hz (base), 240 Hz (normal)', tech: 'Jonny Goicochea' },
+  { date: '2026-06-28', time: '07:55', machine: 'Motor Textil #02', machineId: 'motor2', status: 'yellow', diagnosis: 'Posible desalineación del eje. Frecuencia de 220 Hz fuera del rango óptimo en un 15%. Programar mantenimiento en 72h.', frequencies: '220 Hz (elevada), 440 Hz (armónico)', tech: 'Jonny Goicochea' },
+  { date: '2026-06-28', time: '06:00', machine: 'Turbina #01', machineId: 'turb1', status: 'yellow', diagnosis: 'Vibración moderada detectada a 310 Hz. Revisar anclaje y alineamiento. Monitoreo intensivo recomendado.', frequencies: '310 Hz (elevada)', tech: 'Gino Marquez' },
+  { date: '2026-06-27', time: '16:30', machine: 'Compresor #01', machineId: 'comp1', status: 'green', diagnosis: 'Estado óptimo. Ciclo de compresión dentro de parámetros normales.', frequencies: '60 Hz (base)', tech: 'Carlos Huanca' },
+  { date: '2026-06-27', time: '14:00', machine: 'Faja Transp. #01', machineId: 'faja1', status: 'green', diagnosis: 'Funcionamiento normal. Tensión y velocidad estables.', frequencies: '45 Hz (base)', tech: 'Joseph Ponce' },
+  { date: '2026-06-27', time: '10:20', machine: 'Telar #01', machineId: 'tela1', status: 'green', diagnosis: 'Sin anomalías. Ciclo de tejido regular y estable.', frequencies: '80 Hz (base)', tech: 'Gino Marquez' },
+  { date: '2026-06-26', time: '11:00', machine: 'Motor Textil #03', machineId: 'motor3', status: 'yellow', diagnosis: 'Primer indicio de vibración inusual en rodamiento. Frecuencia 620 Hz ligeramente elevada.', frequencies: '620 Hz (leve), 1240 Hz (armónico)', tech: 'Jonny Goicochea' },
+];
+
+const ALERTS = [
+  { type: 'red', icon: '⚠', title: 'Falla Crítica — Motor Textil #03', desc: 'Frecuencia anómala a 840 Hz. Rodamiento en estado crítico. Se requiere parada preventiva inmediata para evitar daño catastrófico.', meta: 'Hoy, 09:40 · Confianza IA: 91%' },
+  { type: 'yellow', icon: '⚡', title: 'Atención — Motor Textil #02', desc: 'Desalineación del eje detectada a 220 Hz. Programar mantenimiento en las próximas 72 horas. Producción puede continuar con monitoreo.', meta: 'Hoy, 07:55 · Confianza IA: 78%' },
+  { type: 'yellow', icon: '⚡', title: 'Atención — Turbina #01', desc: 'Vibración moderada a 310 Hz. Revisar anclaje y alineamiento. Monitoreo intensivo activado.', meta: 'Hoy, 06:00 · Confianza IA: 72%' },
+];
+
+const CALENDAR_ITEMS = [
+  { date: '28 Jun', machine: 'Motor Textil #03', task: 'Parada correctiva urgente', type: 'urgent' },
+  { date: '30 Jun', machine: 'Motor Textil #02', task: 'Revisión desalineación eje', type: 'warn' },
+  { date: '03 Jul', machine: 'Turbina #01', task: 'Verificar anclaje y alineamiento', type: 'warn' },
+  { date: '10 Jul', machine: 'Compresor #01', task: 'Mantenimiento preventivo estándar', type: 'ok' },
+  { date: '15 Jul', machine: 'Telar #01', task: 'Lubricación programada', type: 'ok' },
+];
+
+const SCAN_RESULTS = {
+  motor1: { status: 'green',  label: 'NORMAL', diagnosis: 'Funcionamiento óptimo. Sin anomalías.', rec: 'Continuar ciclos de monitoreo diario.', hz: '120 Hz', amp: '0.02 g', temp: '45°C', rpm: '1450 RPM', conf: 94 },
+  motor2: { status: 'yellow', label: 'ATENCIÓN', diagnosis: 'Desalineación leve del eje detectada.', rec: 'Programar realineación en 72h. Reducir carga 15%.', hz: '220 Hz', amp: '0.18 g', temp: '61°C', rpm: '1438 RPM', conf: 78 },
+  motor3: { status: 'red',    label: 'FALLA CRÍTICA', diagnosis: 'Rodamiento interior en estado crítico.', rec: 'PARADA INMEDIATA. Reemplazar rodamiento antes de reiniciar.', hz: '840 Hz', amp: '0.74 g', temp: '89°C', rpm: '1412 RPM', conf: 91 },
+  comp1:  { status: 'green',  label: 'NORMAL', diagnosis: 'Ciclo de compresión estable y óptimo.', rec: 'Próximo mantenimiento preventivo: 10 Jul.', hz: '60 Hz', amp: '0.04 g', temp: '52°C', rpm: '960 RPM', conf: 88 },
+  turb1:  { status: 'yellow', label: 'ATENCIÓN', diagnosis: 'Vibración moderada en eje principal.', rec: 'Revisar anclaje y balance. Monitoreo cada 2h.', hz: '310 Hz', amp: '0.31 g', temp: '72°C', rpm: '3000 RPM', conf: 72 },
+};
+
+let currentScanResult = null;
+let scanAnimFrame = null;
+let scanTimerInt = null;
+let waveAnimFrame = null;
+let isRecording = false;
+
+/* ═══════════════ INIT ═══════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  setDate();
+  renderMachinesGrid();
+  renderCalendar();
+  renderTrendChart();
+  drawWaveform();
+  renderMachinesTable(MACHINES);
+  renderHistory();
+  renderAlerts();
+  setInterval(animateWaveform, 50);
+});
+
+function setDate() {
+  const d = new Date();
+  document.getElementById('topbar-date').textContent = d.toLocaleDateString('es-PE', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
+
+/* ═══════════════ VIEW SWITCHING ═══════════════ */
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.querySelector('[data-view="' + id + '"]').classList.add('active');
+  const titles = { dashboard: 'Panel General', scanner: 'Escáner Acústico', machines: 'Activos / Máquinas', history: 'Historial de Escaneos', alerts: 'Centro de Alertas' };
+  document.getElementById('topbar-title').textContent = titles[id];
+  if (window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+/* ═══════════════ DASHBOARD ═══════════════ */
+function renderMachinesGrid() {
+  const grid = document.getElementById('machines-grid-main');
+  grid.innerHTML = MACHINES.map(m => `
+    <div class="machine-tile status-${m.status}" onclick="switchView('scanner'); document.getElementById('scan-machine-select').value='${m.id}'">
+      <div class="machine-tile-name">${m.name}</div>
+      <div class="machine-tile-status">
+        <span class="status-dot dot-${m.status}"></span>
+        ${m.status === 'green' ? 'Normal' : m.status === 'yellow' ? 'Atención' : 'Crítico'}
+      </div>
+      <div class="machine-tile-conf">Conf. IA: ${m.confidence}%</div>
+    </div>
+  `).join('');
+}
+
+function renderCalendar() {
+  document.getElementById('calendar-list').innerHTML = CALENDAR_ITEMS.map(c => `
+    <div class="cal-item ${c.type}">
+      <div class="cal-date">${c.date}</div>
+      <div>
+        <div class="cal-machine">${c.machine}</div>
+        <div class="cal-task">${c.task}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function drawWaveform() {
+  const canvas = document.getElementById('waveform-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = '#00d4ff';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let x = 0; x < W; x++) {
+    const freq = 0.03;
+    const noise = Math.random() * 4;
+    const y = H/2 + Math.sin(x * freq) * 28 + Math.sin(x * 0.08) * 12 + (x > 200 && x < 260 ? Math.sin((x-200)*0.15)*38 : 0) + noise;
+    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  /* Anomaly highlight */
+  ctx.strokeStyle = 'rgba(239,68,68,0.7)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  ctx.moveTo(200, 0); ctx.lineTo(200, H);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(260, 0); ctx.lineTo(260, H);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = 'rgba(239,68,68,0.12)';
+  ctx.fillRect(200, 0, 60, H);
+  ctx.fillStyle = 'rgba(239,68,68,0.85)';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillText('840 Hz', 204, 14);
+}
+
+function renderTrendChart() {
+  const canvas = document.getElementById('trend-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 10, r: 10, t: 10, b: 10 };
+  const w = W - pad.l - pad.r;
+  const h = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  /* Grid lines */
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + (h / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+  }
+
+  /* Data: last 30 days health scores */
+  const data = [92,91,93,90,88,87,86,88,85,84,82,80,79,78,76,74,75,72,70,68,65,60,55,50,44,40,35,28,20,10];
+  const days = data.length;
+
+  /* Draw areas */
+  const getColor = (v) => v >= 75 ? '#22c55e' : v >= 45 ? '#f59e0b' : '#ef4444';
+
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = pad.l + (i / (days-1)) * w;
+    const y = pad.t + h - (v / 100) * h;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = 'rgba(0,212,255,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  /* Colored dots per health zone */
+  data.forEach((v, i) => {
+    const x = pad.l + (i / (days-1)) * w;
+    const y = pad.t + h - (v / 100) * h;
+    ctx.beginPath();
+    ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = getColor(v);
+    ctx.fill();
+  });
+
+  /* Zone labels */
+  ctx.font = '10px JetBrains Mono';
+  ctx.fillStyle = 'rgba(148,163,184,0.7)';
+  ctx.fillText('Día 1', pad.l, H - 2);
+  ctx.fillText('Hoy', W - pad.r - 22, H - 2);
+}
+
+/* ═══════════════ SCANNER ═══════════════ */
+function startScan() {
+  if (isRecording) return;
+  isRecording = true;
+
+  const ring = document.getElementById('mic-ring');
+  const hint = document.getElementById('mic-hint');
+  const progressWrap = document.getElementById('scan-progress-wrap');
+  const progressFill = document.getElementById('scan-progress-fill');
+  const progressLabel = document.getElementById('scan-progress-label');
+  const scanCanvas = document.getElementById('scan-waveform');
+  const steps = document.getElementById('analysis-steps');
+  const resultCard = document.getElementById('result-card');
+
+  ring.classList.add('recording');
+  hint.textContent = 'Grabando audio de la máquina...';
+  progressWrap.style.display = 'flex';
+  scanCanvas.style.display = 'block';
+  steps.style.display = 'flex';
+  resultCard.style.display = 'none';
+
+  /* Reset steps */
+  ['step1','step2','step3','step4'].forEach(s => {
+    document.getElementById(s + '-icon').className = 'step-icon step-pending';
+  });
+
+  let elapsed = 0;
+  const total = 5;
+
+  /* Live waveform */
+  startLiveWaveform(scanCanvas);
+
+  scanTimerInt = setInterval(() => {
+    elapsed++;
+    const pct = (elapsed / total) * 100;
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = `Grabando... ${elapsed}s / ${total}s`;
+
+    if (elapsed >= total) {
+      clearInterval(scanTimerInt);
+      stopLiveWaveform();
+      ring.classList.remove('recording');
+      hint.textContent = 'Analizando con IA...';
+      runAnalysis();
+    }
+  }, 1000);
+}
+
+function startLiveWaveform(canvas) {
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let x = 0; x < W; x++) {
+      const y = H/2 + Math.sin((x + t) * 0.04) * 22 + Math.sin((x + t) * 0.09) * 8 + (Math.random() - 0.5) * 6;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    t += 3;
+    waveAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopLiveWaveform() {
+  cancelAnimationFrame(waveAnimFrame);
+}
+
+function runAnalysis() {
+  const machineId = document.getElementById('scan-machine-select').value;
+  const result = SCAN_RESULTS[machineId] || SCAN_RESULTS['motor1'];
+  currentScanResult = { ...result, machineId };
+
+  const steps = [
+    { id: 'step1', delay: 300,  label: '✓' },
+    { id: 'step2', delay: 900,  label: '✓' },
+    { id: 'step3', delay: 1800, label: '✓' },
+    { id: 'step4', delay: 2700, label: '✓' },
+  ];
+
+  steps.forEach(({ id, delay }, i) => {
+    /* Activate */
+    setTimeout(() => {
+      document.getElementById(id + '-icon').className = 'step-icon step-active';
+      document.getElementById(id + '-icon').textContent = '...';
+    }, delay - 300);
+
+    /* Complete */
+    setTimeout(() => {
+      document.getElementById(id + '-icon').className = 'step-icon step-done';
+      document.getElementById(id + '-icon').textContent = '✓';
+    }, delay);
+  });
+
+  /* Show result */
+  setTimeout(() => {
+    showResult(result, machineId);
+    isRecording = false;
+    document.getElementById('mic-hint').textContent = 'Presiona para iniciar grabación';
+    document.getElementById('scan-progress-wrap').style.display = 'none';
+    document.getElementById('scan-waveform').style.display = 'none';
+  }, 3200);
+}
+
+function showResult(r, machineId) {
+  const machineName = MACHINES.find(m => m.id === machineId)?.name || machineId;
+  const resultCard = document.getElementById('result-card');
+  resultCard.style.display = 'flex';
+
+  /* Semáforo */
+  document.getElementById('sl-red').className    = 'semaforo-light' + (r.status === 'red'    ? ' active-red' : '');
+  document.getElementById('sl-yellow').className = 'semaforo-light' + (r.status === 'yellow' ? ' active-yellow' : '');
+  document.getElementById('sl-green').className  = 'semaforo-light' + (r.status === 'green'  ? ' active-green' : '');
+
+  const colors = { green: '#22c55e', yellow: '#f59e0b', red: '#ef4444' };
+  document.getElementById('result-status').style.color = colors[r.status];
+  document.getElementById('result-status').textContent = r.label;
+  document.getElementById('result-machine').textContent = machineName;
+
+  document.getElementById('result-details').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Diagnóstico</span><span class="detail-value" style="text-align:right;max-width:60%;font-size:0.78rem;font-family:inherit">${r.diagnosis}</span></div>
+    <div class="detail-row"><span class="detail-label">Frecuencia Anómala</span><span class="detail-value">${r.hz}</span></div>
+    <div class="detail-row"><span class="detail-label">Amplitud de Vibración</span><span class="detail-value">${r.amp}</span></div>
+    <div class="detail-row"><span class="detail-label">Temperatura</span><span class="detail-value">${r.temp}</span></div>
+    <div class="detail-row"><span class="detail-label">Velocidad</span><span class="detail-value">${r.rpm}</span></div>
+    <div class="detail-row"><span class="detail-label">Confianza IA</span><span class="detail-value" style="color:var(--accent)">${r.conf}%</span></div>
+    <div class="detail-row"><span class="detail-label">Recomendación</span><span class="detail-value" style="text-align:right;max-width:60%;font-size:0.75rem;font-family:inherit;color:${colors[r.status]}">${r.rec}</span></div>
+  `;
+
+  drawResultSpectrum(r);
+}
+
+function drawResultSpectrum(r) {
+  const canvas = document.getElementById('result-spectrum');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const bars = 40;
+  const barW = (W - 20) / bars;
+  const baseNoise = [0.1, 0.15, 0.12, 0.08, 0.2, 0.18, 0.1, 0.09, 0.14, 0.11, 0.13, 0.10, 0.12, 0.08, 0.07, 0.06, 0.08, 0.07, 0.05, 0.06, 0.08, 0.07, 0.05, 0.04, 0.06, 0.05, 0.04, 0.03, 0.05, 0.04, 0.03, 0.04, 0.05, 0.03, 0.04, 0.06, 0.03, 0.04, 0.05, 0.03];
+
+  /* Anomaly spike position */
+  const spikePos = { red: 16, yellow: 9, green: 3 }[r.status];
+  const spikeH = { red: 0.85, yellow: 0.52, green: 0.22 }[r.status];
+  const spikeColor = { red: '#ef4444', yellow: '#f59e0b', green: '#22c55e' }[r.status];
+
+  for (let i = 0; i < bars; i++) {
+    let h = baseNoise[i] + Math.random() * 0.03;
+    if (i === spikePos) h = spikeH;
+    if (i === spikePos + 1 && r.status !== 'green') h = spikeH * 0.4;
+
+    const barH = h * (H - 20);
+    const x = 10 + i * barW;
+    const y = H - 10 - barH;
+
+    ctx.fillStyle = (i === spikePos || (i === spikePos + 1 && r.status !== 'green')) ? spikeColor : 'rgba(0,212,255,0.4)';
+    ctx.fillRect(x, y, barW - 2, barH);
+  }
+
+  /* Hz labels */
+  ctx.fillStyle = 'rgba(148,163,184,0.6)';
+  ctx.font = '9px JetBrains Mono';
+  ctx.fillText('0', 10, H - 1);
+  ctx.fillText('1k', W/2 - 8, H - 1);
+  ctx.fillText('4kHz', W - 30, H - 1);
+}
+
+function scanAgain() {
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('analysis-steps').style.display = 'none';
+  document.getElementById('scan-waveform').style.display = 'none';
+  currentScanResult = null;
+}
+
+/* ═══════════════ MACHINES TABLE ═══════════════ */
+function renderMachinesTable(list) {
+  const tbody = document.getElementById('machines-table-body');
+  tbody.innerHTML = list.map(m => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim)">${m.id}</td>
+      <td style="font-weight:600">${m.name}</td>
+      <td style="color:var(--text-mid)">${m.sector}</td>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim)">${m.lastScan}</td>
+      <td><span class="status-pill pill-${m.status}"><span class="status-dot dot-${m.status}"></span>${m.status === 'green' ? 'Normal' : m.status === 'yellow' ? 'Atención' : 'Crítico'}</span></td>
+      <td><div class="conf-bar"><div class="conf-track"><div class="conf-fill" style="width:${m.confidence}%;background:${m.status==='red'?'#ef4444':m.status==='yellow'?'#f59e0b':'var(--accent)'}"></div></div><span class="conf-pct">${m.confidence}%</span></div></td>
+      <td>
+        <button class="btn-icon" onclick="scanMachine('${m.id}')">Escanear</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function scanMachine(id) {
+  document.getElementById('scan-machine-select').value = id;
+  switchView('scanner');
+}
+
+function filterMachines(query) {
+  const q = query.toLowerCase();
+  const filtered = MACHINES.filter(m => m.name.toLowerCase().includes(q) || m.sector.toLowerCase().includes(q) || m.type.toLowerCase().includes(q));
+  renderMachinesTable(filtered);
+}
+
+function openAddMachine() {
+  document.getElementById('add-machine-modal').style.display = 'flex';
+}
+function closeAddMachine() {
+  document.getElementById('add-machine-modal').style.display = 'none';
+}
+function addMachine() {
+  const name = document.getElementById('new-machine-name').value.trim();
+  if (!name) { showToast('⚠ Ingresa el nombre del activo'); return; }
+  const sector = document.getElementById('new-machine-sector').value;
+  const type = document.getElementById('new-machine-type').value;
+  const id = 'custom_' + Date.now();
+  MACHINES.push({ id, name, sector, type, status: 'green', confidence: 0, lastScan: 'Sin escaneos', anomaly: null });
+  renderMachinesTable(MACHINES);
+  renderMachinesGrid();
+  closeAddMachine();
+  showToast('✓ Activo "' + name + '" registrado correctamente');
+}
+
+function closeModal(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.style.display = 'none';
+  }
+}
+
+/* ═══════════════ HISTORY ═══════════════ */
+function renderHistory() {
+  const mFilter = document.getElementById('history-machine-filter').value;
+  const sFilter = document.getElementById('history-status-filter').value;
+  let list = HISTORY;
+  if (mFilter) list = list.filter(h => h.machineId === mFilter);
+  if (sFilter) list = list.filter(h => h.status === sFilter);
+
+  const colorMap = { green: '#22c55e', yellow: '#f59e0b', red: '#ef4444' };
+
+  document.getElementById('history-timeline').innerHTML = list.map((h, i) => `
+    <div class="history-item">
+      <div class="hist-time-col">
+        <div class="hist-date">${h.date}</div>
+        <div class="hist-time">${h.time}</div>
+      </div>
+      <div class="hist-dot-col">
+        <div class="hist-dot dot-${h.status}"></div>
+        ${i < list.length - 1 ? '<div class="hist-line"></div>' : ''}
+      </div>
+      <div class="hist-content">
+        <div class="hist-machine">${h.machine}</div>
+        <div class="hist-diag">${h.diagnosis}</div>
+        <div class="hist-freq">Frecuencias: ${h.frequencies}</div>
+        <div class="hist-tech">Técnico: ${h.tech}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════ ALERTS ═══════════════ */
+function renderAlerts() {
+  const colorIcons = { red: '#ef4444', yellow: '#f59e0b' };
+  document.getElementById('alerts-list').innerHTML = ALERTS.map(a => `
+    <div class="alert-item alert-${a.type}">
+      <div class="alert-icon ai-${a.type}">
+        <span style="font-size:1.2rem">${a.icon}</span>
+      </div>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-desc">${a.desc}</div>
+        <div class="alert-meta">${a.meta}</div>
+      </div>
+      <div class="alert-action">
+        <button class="btn-icon" style="padding:6px 10px">Ver</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════ REPORT ═══════════════ */
+function generateReport() {
+  if (!currentScanResult) return;
+  const machineId = currentScanResult.machineId;
+  const machineName = MACHINES.find(m => m.id === machineId)?.name || machineId;
+  const r = currentScanResult;
+  const now = new Date().toLocaleString('es-PE');
+  const colors = { green: '#22c55e', yellow: '#f59e0b', red: '#ef4444' };
+  const labels = { green: 'NORMAL', yellow: 'REQUIERE ATENCIÓN', red: 'FALLA CRÍTICA' };
+
+  document.getElementById('report-meta').innerHTML = `
+    Fecha: ${now}<br>
+    ID Activo: ${machineId}<br>
+    Operador: Jonny Goicochea
+  `;
+
+  document.getElementById('report-body').innerHTML = `
+    <div class="report-section">
+      <div class="report-section-title">Estado del Activo</div>
+      <div class="report-status-badge" style="background:${colors[r.status]}20;border:1px solid ${colors[r.status]}40;color:${colors[r.status]}">
+        <span class="status-dot dot-${r.status}"></span> ${labels[r.status]}
+      </div>
+      <div class="report-row"><span>Activo</span><span style="font-weight:600">${machineName}</span></div>
+      <div class="report-row"><span>Diagnóstico</span><span>${r.diagnosis}</span></div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title">Datos Técnicos</div>
+      <div class="report-row"><span>Frecuencia Anómala</span><span style="font-family:var(--font-mono)">${r.hz}</span></div>
+      <div class="report-row"><span>Amplitud de Vibración</span><span style="font-family:var(--font-mono)">${r.amp}</span></div>
+      <div class="report-row"><span>Temperatura Superficial</span><span style="font-family:var(--font-mono)">${r.temp}</span></div>
+      <div class="report-row"><span>Velocidad de Operación</span><span style="font-family:var(--font-mono)">${r.rpm}</span></div>
+      <div class="report-row"><span>Confianza del Modelo IA</span><span style="font-family:var(--font-mono);color:var(--accent)">${r.conf}%</span></div>
+    </div>
+    <div class="report-section" style="border:1px solid ${colors[r.status]}30;background:${colors[r.status]}0a">
+      <div class="report-section-title" style="color:${colors[r.status]}">Recomendación de Acción</div>
+      <div style="font-size:0.85rem;line-height:1.6">${r.rec}</div>
+    </div>
+    <div class="report-section" style="font-size:0.72rem;color:var(--text-dim)">
+      Reporte generado automáticamente por MachinaSense v1.0 · Motor de IA: CNN Acoustic Model v2.3 · Startup: MachinaSense · UPC 2026
+    </div>
+  `;
+
+  document.getElementById('report-modal').style.display = 'flex';
+}
+
+function shareReport() {
+  showToast('✓ Reporte listo para compartir por WhatsApp o correo');
+  document.getElementById('report-modal').style.display = 'none';
+}
+
+/* ═══════════════ WAVEFORM ANIMATION ═══════════════ */
+let _wt = 0;
+function animateWaveform() {
+  const canvas = document.getElementById('waveform-canvas');
+  if (!canvas || !document.getElementById('view-dashboard').classList.contains('active')) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = '#00d4ff';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let x = 0; x < W; x++) {
+    const y = H/2 + Math.sin((x + _wt) * 0.03) * 28 + Math.sin((x + _wt) * 0.07) * 12 + (x > 200 && x < 260 ? Math.sin((x-200)*0.15)*38 : 0) + (Math.random() - 0.5) * 2;
+    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  /* Anomaly zone */
+  ctx.fillStyle = 'rgba(239,68,68,0.08)';
+  ctx.fillRect(200, 0, 60, H);
+  ctx.strokeStyle = 'rgba(239,68,68,0.5)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(200,0); ctx.lineTo(200,H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(260,0); ctx.lineTo(260,H); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(239,68,68,0.9)';
+  ctx.font = '10px JetBrains Mono';
+  ctx.fillText('840 Hz', 204, 14);
+  _wt += 1.5;
+}
+
+/* ═══════════════ TOAST ═══════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+  </script>
+</body>
+</html>
